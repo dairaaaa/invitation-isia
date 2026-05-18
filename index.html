@@ -91,6 +91,43 @@
     font-weight: 300;
   }
 
+  /* Mobile: ticket rotated 90deg, text on top */
+  @media (max-width: 600px) {
+    body {
+      overflow: hidden;
+    }
+
+    .scene {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .hint {
+      order: -1;
+      font-size: 10px;
+      text-align: center;
+      padding: 0 16px;
+    }
+
+    .ticket-stage {
+      perspective: 900px;
+    }
+
+    .ticket-wrap {
+      width: 96vh !important;
+      transform-origin: center center;
+    }
+
+    /* The base transform for mobile adds 90deg rotation on top of the 3D tilt */
+    .ticket-wrap {
+      --mobile-rotate: rotate(90deg);
+    }
+  }
+
   /* Entry animation */
   @keyframes reveal {
     from { opacity: 0; transform: translateY(24px); }
@@ -121,8 +158,18 @@
   let lastX = 0, lastY = 0;
   let raf;
 
+  const isMobile = () => window.innerWidth <= 600;
+
+  // Max rotation before back becomes visible (~70deg is safe)
+  const MAX_Y = 70;
+  const MAX_X = 28;
+
   function applyTransform() {
-    ticket.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    if (isMobile()) {
+      ticket.style.transform = `rotate(90deg) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    } else {
+      ticket.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    }
   }
 
   function loop() {
@@ -131,7 +178,8 @@
       velY *= 0.94;
       rotX += velX;
       rotY += velY;
-      rotX = Math.max(-28, Math.min(28, rotX));
+      rotX = Math.max(-MAX_X, Math.min(MAX_X, rotX));
+      rotY = Math.max(-MAX_Y, Math.min(MAX_Y, rotY));
     }
     applyTransform();
     raf = requestAnimationFrame(loop);
@@ -153,7 +201,8 @@
     velX = -dy * 0.28;
     rotY += velY;
     rotX += velX;
-    rotX = Math.max(-30, Math.min(30, rotX));
+    rotX = Math.max(-MAX_X, Math.min(MAX_X, rotX));
+    rotY = Math.max(-MAX_Y, Math.min(MAX_Y, rotY));
     lastX = e.clientX; lastY = e.clientY;
   });
   window.addEventListener('mouseup', () => { isDragging = false; });
@@ -173,7 +222,8 @@
     velX = -dy * 0.28;
     rotY += velY;
     rotX += velX;
-    rotX = Math.max(-30, Math.min(30, rotX));
+    rotX = Math.max(-MAX_X, Math.min(MAX_X, rotX));
+    rotY = Math.max(-MAX_Y, Math.min(MAX_Y, rotY));
     lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
     e.preventDefault();
   }, { passive: false });
