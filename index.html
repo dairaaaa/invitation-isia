@@ -84,7 +84,7 @@
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.35);
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-weight: 300;
+    font-weight: 500;
     white-space: nowrap;
   }
 
@@ -204,7 +204,13 @@
     if (!isDragging) return;
     const dx = e.touches[0].clientX - lastX;
     const dy = e.touches[0].clientY - lastY;
-    velY = dx * 0.28; velX = -dy * 0.28;
+    // Scene is rotated -90deg on mobile, so axes are swapped
+    const mobile = window.innerWidth <= 600;
+    if (mobile) {
+      velY = -dy * 0.28; velX = -dx * 0.28;
+    } else {
+      velY = dx * 0.28; velX = -dy * 0.28;
+    }
     rotY += velY; rotX += velX;
     rotX = Math.max(-MAX_X, Math.min(MAX_X, rotX));
     rotY = Math.max(-MAX_Y, Math.min(MAX_Y, rotY));
