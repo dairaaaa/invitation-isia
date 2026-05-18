@@ -5,14 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Belladonna — Release Party</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap');
-
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --bg: #f0ede8;
-    --grain-opacity: 0.04;
-    --shadow-color: rgba(60, 50, 40, 0.18);
+    --bg: #000000;
+    --shadow-color: rgba(255, 255, 255, 0.08);
   }
 
   html, body {
@@ -25,7 +22,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Cormorant Garamond', Georgia, serif;
   }
 
   /* Grain overlay */
@@ -34,7 +30,7 @@
     position: fixed;
     inset: 0;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-    opacity: var(--grain-opacity);
+    opacity: 0.035;
     pointer-events: none;
     z-index: 0;
   }
@@ -44,7 +40,7 @@
     content: '';
     position: fixed;
     inset: 0;
-    background: radial-gradient(ellipse at center, transparent 40%, rgba(180, 170, 158, 0.35) 100%);
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
     pointer-events: none;
     z-index: 0;
   }
@@ -55,7 +51,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 28px;
+    gap: 32px;
   }
 
   .ticket-stage {
@@ -63,16 +59,16 @@
   }
 
   .ticket-wrap {
-    width: min(640px, 90vw);
+    width: min(820px, 92vw);
     transform-style: preserve-3d;
     will-change: transform;
     cursor: grab;
     user-select: none;
     border-radius: 10px;
     box-shadow:
-      0 2px 4px var(--shadow-color),
-      0 8px 24px rgba(60, 50, 40, 0.12),
-      0 24px 60px rgba(60, 50, 40, 0.10);
+      0 2px 8px rgba(255,255,255,0.04),
+      0 12px 40px rgba(255,255,255,0.06),
+      0 40px 80px rgba(0,0,0,0.6);
     transition: box-shadow 0.3s ease;
   }
 
@@ -86,64 +82,22 @@
     -webkit-user-drag: none;
   }
 
-  /* Controls */
-  .controls {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .btn {
-    background: transparent;
-    border: 0.5px solid rgba(80, 70, 60, 0.3);
-    color: rgba(80, 70, 60, 0.7);
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 7px 18px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .btn:hover {
-    background: rgba(80, 70, 60, 0.06);
-    color: rgba(80, 70, 60, 1);
-    border-color: rgba(80, 70, 60, 0.5);
-  }
-
-  .btn.active {
-    background: rgba(80, 70, 60, 0.1);
-    color: rgba(80, 70, 60, 1);
-    border-color: rgba(80, 70, 60, 0.6);
-  }
-
   .hint {
-    font-size: 10px;
-    letter-spacing: 0.15em;
+    font-size: 11px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: rgba(80, 70, 60, 0.35);
-    font-family: 'Cormorant Garamond', Georgia, serif;
-  }
-
-  /* Float animation */
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-
-  .floating .ticket-wrap {
-    animation: float 4s ease-in-out infinite;
+    color: rgba(255, 255, 255, 0.35);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 300;
   }
 
   /* Entry animation */
   @keyframes reveal {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(24px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  .scene { animation: reveal 1s ease both; }
+  .scene { animation: reveal 1.2s ease both; }
 </style>
 </head>
 <body>
@@ -155,38 +109,24 @@
     </div>
   </div>
 
-  <div class="controls">
-    <button class="btn" id="btnSpin">Rotation</button>
-    <button class="btn" id="btnFloat">Flottement</button>
-    <button class="btn" id="btnReset">Reset</button>
-  </div>
-
-  <p class="hint" id="hint">Glisse pour orienter · 29.05.2026 · Le Groove</p>
+  <p class="hint">Vous êtes invité·e à la release party d'Isia Mendes.</p>
 </div>
 
 <script>
   const ticket = document.getElementById('ticket');
-  const stage  = document.getElementById('stage');
 
   let rotX = -2, rotY = 4;
   let velX = 0, velY = 0;
   let isDragging = false;
   let lastX = 0, lastY = 0;
-  let autoSpin = false;
-  let spinAngle = 4;
-  let floatOn = false;
   let raf;
 
-  function applyTransform(extraY = 0) {
+  function applyTransform() {
     ticket.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
   }
 
   function loop() {
-    if (autoSpin) {
-      spinAngle += 0.35;
-      rotY = spinAngle;
-      rotX += (0 - rotX) * 0.03;
-    } else if (!isDragging) {
+    if (!isDragging) {
       velX *= 0.94;
       velY *= 0.94;
       rotX += velX;
@@ -203,7 +143,6 @@
     isDragging = true;
     lastX = e.clientX; lastY = e.clientY;
     velX = 0; velY = 0;
-    if (autoSpin) stopSpin();
     e.preventDefault();
   });
   window.addEventListener('mousemove', e => {
@@ -224,7 +163,6 @@
     isDragging = true;
     lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
     velX = 0; velY = 0;
-    if (autoSpin) stopSpin();
     e.preventDefault();
   }, { passive: false });
   window.addEventListener('touchmove', e => {
@@ -240,29 +178,6 @@
     e.preventDefault();
   }, { passive: false });
   window.addEventListener('touchend', () => { isDragging = false; });
-
-  function stopSpin() {
-    autoSpin = false;
-    document.getElementById('btnSpin').classList.remove('active');
-  }
-
-  document.getElementById('btnSpin').addEventListener('click', function() {
-    autoSpin = !autoSpin;
-    this.classList.toggle('active', autoSpin);
-    if (autoSpin) spinAngle = rotY;
-  });
-
-  document.getElementById('btnFloat').addEventListener('click', function() {
-    floatOn = !floatOn;
-    this.classList.toggle('active', floatOn);
-    stage.classList.toggle('floating', floatOn);
-  });
-
-  document.getElementById('btnReset').addEventListener('click', () => {
-    rotX = -2; rotY = 4; velX = 0; velY = 0;
-    autoSpin = false;
-    document.getElementById('btnSpin').classList.remove('active');
-  });
 </script>
 </body>
 </html>
